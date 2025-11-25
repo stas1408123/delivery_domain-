@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Ordering.Application.Orders.Commands.CreateOrder;
+using Ordering.Application.Orders.Queries.GetOrder;
 
 namespace Ordering.API.Controllers
 {
@@ -17,6 +18,23 @@ namespace Ordering.API.Controllers
             _logger = logger;
             _mediator = mediator;
         }
+
+        [HttpGet]
+        public async Task<IEnumerable<OrderDraftDTO>> GetOrders()
+        {
+            var command = new GetOrdersQuery();
+
+            _logger.LogInformation(
+                "Sending command: {CommandName} - {IdProperty}: {CommandId} ({@Command})",
+                "Get Orders",
+                nameof(command),
+                "",
+                command);
+
+            return await _mediator.Send(command);
+        }
+
+
 
         [HttpPost(Name = "AddOrder")]
         public async Task<OrderDraftDTO> CreateOrderDraftAsync(CreateOrderCommand command)
