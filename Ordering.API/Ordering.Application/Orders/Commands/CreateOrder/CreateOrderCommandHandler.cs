@@ -28,6 +28,8 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Ord
             entity.Dishes.Add(new Dish(item.Amount, item.Cost));
         }
 
+        entity.CalculateTotalAmount();
+
         _context.Orders.Add(entity);
 
         await _context.SaveChangesAsync(cancellationToken);

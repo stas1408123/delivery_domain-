@@ -17,7 +17,7 @@ namespace Ordering.Application.Orders.Commands.CreateOrder
                     Cost = oi.Cost,
                     SubTotal = oi.SubTotal
                 }),
-                Total = 0 //order.GetTotal()
+                Total = order.TotalAmount,
             };
         }
     }

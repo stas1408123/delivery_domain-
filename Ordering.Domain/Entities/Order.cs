@@ -6,16 +6,23 @@ namespace Ordering.Domain.Entities
     {
         public Guid UserId { get; set; }
 
-        public Guid TotalAmount { get; set; }
+        public decimal TotalAmount { get; set; }
 
         public OrderStatus Status { get; set; }
 
         public int ItemCount { get; set; }
 
         public IList<Dish> Dishes { get; set; } = new List<Dish>();
+
+
+        public void CalculateTotalAmount()
+        {
+            if (Dishes.Count == 0)
+            {
+                this.TotalAmount = 0;
+            }
+
+            this.TotalAmount = Dishes.Sum(x => x.SubTotal);
+        }
     }
 }
-
-// -Идентификатор пользователя
-// - Общее количество блюд в заказе  
-// - Общая стоимость заказа  
