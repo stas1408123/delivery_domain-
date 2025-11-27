@@ -5,10 +5,33 @@ namespace Ordering.Domain.Entities
     public class Dish : BaseEntity
     {
         private decimal subTotal;
+        private int amount;
+        private decimal cost;
 
-        public int Amount { get; set; }
+        public int Amount
+        {
+            get => amount;
+            set
+            {
+                amount = value;
+                subTotal = this.Amount * this.Cost;
+            }
+        }
 
-        public decimal Cost { get; set; }
+        public decimal Cost 
+        { 
+            get => cost; 
+            set
+            {
+                cost = value;
+                subTotal = this.Amount * this.Cost;
+            }
+        }
+
+        public Guid OrderId { get; set; }
+
+        public Order order { get; set; }
+
         public decimal SubTotal
         {
             get => this.subTotal;

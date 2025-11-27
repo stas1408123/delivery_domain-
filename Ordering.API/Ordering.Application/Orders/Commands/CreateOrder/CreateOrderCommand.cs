@@ -6,6 +6,8 @@ namespace Ordering.Application.Orders.Commands.CreateOrder
 
     public class BasketItem
     {
+        public Guid Id { get; init; }
+
         public int Amount { get; init; }
 
         public decimal Cost { get; init; }

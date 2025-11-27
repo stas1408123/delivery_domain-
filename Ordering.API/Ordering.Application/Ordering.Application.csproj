@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Dishes\Commands\" />
     <Folder Include="Dishes\Queries\" />
     <Folder Include="Orders\Commands\UpdateStatus\" />
     <Folder Include="Orders\Commands\UpdateOrder\" />
