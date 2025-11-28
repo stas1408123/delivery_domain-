@@ -12,7 +12,7 @@ namespace Ordering.Application.Common.Interfaces
     {
         DbSet<Order> Orders { get; }
 
-        DbSet<Dish> Dishs { get; }
+        DbSet<Dish> Dishes { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }

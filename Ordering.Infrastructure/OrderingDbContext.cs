@@ -13,6 +13,6 @@ namespace Ordering.Infrastructure
 
         public DbSet<Order> Orders { get; set; }
 
-        public DbSet<Dish> Dishs { get; set; }
+        public DbSet<Dish> Dishes { get; set; }
     }
 }

@@ -19,7 +19,7 @@ namespace Ordering.API.Controllers
         }
 
         [HttpPost]
-        public async Task<OrderDraftDTO> AddDish(AddDishCommand command, CancellationToken cancellationToken)
+        public async Task<OrderDraftDTO> Add(AddDishCommand command, CancellationToken cancellationToken)
         {
             _logger.LogInformation(
                 "Sending command: {CommandName} - {IdProperty}: {CommandId} ({@Command})",
@@ -32,7 +32,7 @@ namespace Ordering.API.Controllers
         }
 
         [HttpPatch]
-        public async Task<OrderDraftDTO> UpdateDish(UpdateDishCommand command, CancellationToken cancellationToken)
+        public async Task<OrderDraftDTO> Update(UpdateDishCommand command, CancellationToken cancellationToken)
         {
             _logger.LogInformation(
                 "Sending command: {CommandName}: ({@Command})",
@@ -40,6 +40,19 @@ namespace Ordering.API.Controllers
                 command);
 
             return await _mediator.Send(command);
+        }
+
+        [HttpDelete]
+        public async Task Delete([FromQuery] Guid Id, CancellationToken cancellationToken)
+        {
+            var command = new DeleteDishCommand(Id);
+
+            _logger.LogInformation(
+                "Sending command: {CommandName}: ({@Command})",
+                "Delete Dish",
+                command);
+
+            await _mediator.Send(command);
         }
     }
 }
