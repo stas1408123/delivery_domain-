@@ -18,9 +18,9 @@ namespace Ordering.Domain.Entities
             }
         }
 
-        public decimal Cost 
-        { 
-            get => cost; 
+        public decimal Cost
+        {
+            get => cost;
             set
             {
                 cost = value;

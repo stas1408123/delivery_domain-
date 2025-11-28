@@ -1,11 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ordering.Application.Common
 {
@@ -14,7 +9,8 @@ namespace Ordering.Application.Common
         public static void AddApplicationServices(this IHostApplicationBuilder builder)
         {
 
-            builder.Services.AddMediatR(cfg => {
+            builder.Services.AddMediatR(cfg =>
+            {
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
             });
         }

@@ -14,7 +14,6 @@ namespace Ordering.Domain.Entities
 
         public IList<Dish> Dishes { get; set; } = new List<Dish>();
 
-
         public void CalculateTotalAmount()
         {
             if (Dishes.Count == 0)
