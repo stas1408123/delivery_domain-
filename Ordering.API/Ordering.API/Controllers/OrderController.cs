@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Ordering.Application.Orders.Commands.CreateOrder;
+using Ordering.Application.Orders.Commands.UpdateStatus;
 using Ordering.Application.Orders.Queries.GetOrder;
 
 namespace Ordering.API.Controllers
@@ -44,6 +45,17 @@ namespace Ordering.API.Controllers
                 "Draft Order",
                 nameof(command.BuyerId),
                 command.BuyerId,
+                command);
+
+            return await _mediator.Send(command);
+        }
+
+        [HttpPatch]
+        public async Task<OrderDraftDTO> UpdateOrderStatus(UpdateOrderStatusCommand command)
+        {
+            _logger.LogInformation(
+                "Sending command: {CommandName} - ({@Command})",
+                "Update Order",
                 command);
 
             return await _mediator.Send(command);
