@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Ordering.Domain.AggregatesModels.OrderAggregate;
 using Ordering.Domain.Entities;
 
 namespace Ordering.Application.Common.Interfaces

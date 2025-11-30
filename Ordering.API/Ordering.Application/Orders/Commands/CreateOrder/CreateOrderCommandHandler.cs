@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Ordering.Application.Common.Interfaces;
+using Ordering.Domain.AggregatesModels.OrderAggregate;
 using Ordering.Domain.Entities;
 
 namespace Ordering.Application.Orders.Commands.CreateOrder;
@@ -21,7 +22,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Ord
 
         entity.UserId = request.BuyerId;
 
-        entity.Status = Domain.OrderStatus.New;
+        entity.Status = OrderStatus.New;
 
         foreach (var item in request.Items)
         {

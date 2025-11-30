@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Ordering.Application.Orders.Commands.CreateOrder;
-using Ordering.Domain;
+using Ordering.Domain.AggregatesModels.OrderAggregate;
 
 namespace Ordering.Application.Orders.Commands.UpdateStatus
 {

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Ordering.Application.Common.Interfaces;
 using Ordering.Application.Orders.Commands.CreateOrder;
-using Ordering.Domain.Entities;
+using Ordering.Domain.AggregatesModels.OrderAggregate;
 
 namespace Ordering.Application.Dishes.Commands
 {
