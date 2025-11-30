@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Ordering.Application.Common.Interfaces;
 using Ordering.Application.Orders.Commands.CreateOrder;
-using Ordering.Domain.Entities;
+using Ordering.Domain.AggregatesModels.OrderAggregate;
 
 namespace Ordering.Application.Dishes.Commands
 {
@@ -21,11 +21,9 @@ namespace Ordering.Application.Dishes.Commands
                 .Include(x => x.Dishes)
                 .FirstOrDefaultAsync(o => o.UserId == command.BuyerId, cancellationToken);
 
-            var dish = new Dish(command.Item.Amount, command.Item.Cost);
+            var dish = new Dish(command.Item.ProductId, command.Item.Amount, command.Item.Cost);
 
-            order.Dishes.Add(dish);
-
-            order.CalculateTotalAmount();
+            order.AddDish(dish);
 
             _context.Orders.Update(order);
 

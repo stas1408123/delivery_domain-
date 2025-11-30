@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Ordering.Application.Common.Interfaces;
 using Ordering.Domain.AggregatesModels.OrderAggregate;
-using Ordering.Domain.Entities;
 
 namespace Ordering.Infrastructure
 {

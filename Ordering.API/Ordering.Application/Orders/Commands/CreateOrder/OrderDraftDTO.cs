@@ -1,4 +1,4 @@
-﻿using Ordering.Domain.Entities;
+﻿using Ordering.Domain.AggregatesModels.OrderAggregate;
 
 namespace Ordering.Application.Orders.Commands.CreateOrder
 {

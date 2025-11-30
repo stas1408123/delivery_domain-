@@ -21,21 +21,13 @@ namespace Ordering.Application.Dishes.Commands
                 .Include(x => x.Dishes)
                 .FirstOrDefaultAsync(o => o.Id == command.OrderId, cancellationToken);
 
-            ChangeDishInfo(command, order.Dishes.Single(x => x.Id == command.item.Id));
+            var dish = new Dish(command.item.ProductId, command.item.Amount, command.item.Cost);
 
-            order.CalculateTotalAmount();
-
-            _context.Orders.Update(order);
+            order.UpdateDish(dish);
 
             await _context.SaveChangesAsync(cancellationToken);
 
             return OrderDraftDTO.FromOrder(order);
-        }
-
-        private static void ChangeDishInfo(UpdateDishCommand command, Dish dish)
-        {
-            dish.Cost = command.item.Cost;
-            dish.Amount = command.item.Amount;
         }
     }
 }

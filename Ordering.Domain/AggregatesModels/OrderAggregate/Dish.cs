@@ -7,6 +7,8 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
         private decimal subTotal;
         private int amount;
         private decimal cost;
+
+        public Guid ProductId { get; set; }
         public Guid OrderId { get; set; }
 
         public Order order { get; set; }
@@ -40,8 +42,9 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
             }
         }
 
-        public Dish(int amount, decimal cost)
+        public Dish(Guid productId, int amount, decimal cost)
         {
+            ProductId = productId;
             Amount = amount;
             Cost = cost;
             SubTotal = Amount * Cost;

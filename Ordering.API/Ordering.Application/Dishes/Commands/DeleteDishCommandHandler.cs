@@ -21,9 +21,7 @@ namespace Ordering.Application.Dishes.Commands
                 .Include(x => x.Dishes)
                 .FirstOrDefaultAsync(o => o.Id == dish.OrderId, cancellationToken);
 
-            order.Dishes.Remove(dish);
-
-            order.CalculateTotalAmount();
+            order.DeleteDish(dish);
 
             _context.Orders.Update(order);
 

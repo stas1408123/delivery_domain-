@@ -17,8 +17,7 @@ namespace Ordering.Application.Orders.Commands.UpdateStatus
         {
             var order = _context.Orders.Single(x => x.Id == command.OrderId);
 
-            // ToDo Some business logic for status change 
-            order.Status = command.status;
+            order.UpdateStatus(command.status);
 
             await _context.SaveChangesAsync(cancellationToken);
 
