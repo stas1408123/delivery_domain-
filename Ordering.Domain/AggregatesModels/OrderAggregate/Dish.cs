@@ -1,12 +1,15 @@
 ﻿using Ordering.Domain.Common;
 
-namespace Ordering.Domain.Entities
+namespace Ordering.Domain.AggregatesModels.OrderAggregate
 {
     public class Dish : BaseEntity
     {
         private decimal subTotal;
         private int amount;
         private decimal cost;
+        public Guid OrderId { get; set; }
+
+        public Order order { get; set; }
 
         public int Amount
         {
@@ -14,7 +17,7 @@ namespace Ordering.Domain.Entities
             set
             {
                 amount = value;
-                subTotal = this.Amount * this.Cost;
+                subTotal = Amount * Cost;
             }
         }
 
@@ -24,20 +27,16 @@ namespace Ordering.Domain.Entities
             set
             {
                 cost = value;
-                subTotal = this.Amount * this.Cost;
+                subTotal = Amount * Cost;
             }
         }
 
-        public Guid OrderId { get; set; }
-
-        public Order order { get; set; }
-
         public decimal SubTotal
         {
-            get => this.subTotal;
+            get => subTotal;
             private set
             {
-                subTotal = this.Amount * this.Cost;
+                subTotal = Amount * Cost;
             }
         }
 
@@ -45,7 +44,7 @@ namespace Ordering.Domain.Entities
         {
             Amount = amount;
             Cost = cost;
-            SubTotal = this.Amount * this.Cost;
+            SubTotal = Amount * Cost;
         }
     }
 }

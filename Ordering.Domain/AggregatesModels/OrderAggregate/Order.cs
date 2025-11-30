@@ -1,6 +1,6 @@
 ﻿using Ordering.Domain.Common;
 
-namespace Ordering.Domain.Entities
+namespace Ordering.Domain.AggregatesModels.OrderAggregate
 {
     public class Order : BaseEntity
     {
