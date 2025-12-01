@@ -7,6 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Dishes\Queries\**" />
+    <Compile Remove="Orders\Commands\UpdateOrder\**" />
+    <EmbeddedResource Remove="Dishes\Queries\**" />
+    <EmbeddedResource Remove="Orders\Commands\UpdateOrder\**" />
+    <None Remove="Dishes\Queries\**" />
+    <None Remove="Orders\Commands\UpdateOrder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="15.0.1" />
     <PackageReference Include="MediatR" Version="13.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
@@ -14,12 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Dishes\Queries\" />
-    <Folder Include="Orders\Commands\UpdateOrder\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Ordering.Domain\Ordering.Domain.csproj" />
+    <ProjectReference Include="..\Ordering.Domain\Ordering.Domain.csproj" />
   </ItemGroup>
 
 </Project>
