@@ -16,8 +16,6 @@ namespace Ordering.Application.Orders.Queries.GetOrder
 
         public async Task<IEnumerable<OrderDraftDTO>> Handle(GetOrdersQuery request, CancellationToken cancellationToken)
         {
-            var orders = await _context.Orders.Include(x => x.Dishes).ToListAsync();
-
             return (await _context.Orders.Include(x => x.Dishes).ToListAsync()).Select(OrderDraftDTO.FromOrder);
         }
     }
