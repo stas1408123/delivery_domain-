@@ -10,27 +10,29 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
 
         public OrderStatus Status { get; private set; }
 
-        public int ItemCount { get; set; }
+        public int ItemCount { get; private set; }
 
-        public IList<Dish> Dishes { get; set; } = new List<Dish>();
+        private readonly IList<Dish> _dishes = new List<Dish>();
+
+        public IReadOnlyCollection<Dish> Dishes => _dishes.AsReadOnly();
 
         public void CalculateTotalAmount()
         {
-            if (Dishes.Count == 0)
+            if (_dishes.Count == 0)
             {
                 this.TotalAmount = 0;
             }
 
-            this.TotalAmount = Dishes.Sum(x => x.SubTotal);
+            this.TotalAmount = _dishes.Sum(x => x.SubTotal);
         }
 
         public void AddDish(Dish dish)
         {
-            var dishInOrder = Dishes.SingleOrDefault(d => d.ProductId == d.ProductId);
+            var dishInOrder = _dishes.SingleOrDefault(d => d.ProductId == d.ProductId);
 
             if (dishInOrder == null)
             {
-                Dishes.Add(dish);
+                _dishes.Add(dish);
             }
             else
             {
@@ -49,7 +51,7 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
                 return;
             }
 
-            Dishes.Remove(dish);
+            _dishes.Remove(dish);
             CalculateTotalAmount();
         }
 
@@ -59,7 +61,7 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
 
             if (dish == null)
             {
-                Dishes.Add(dish);
+                _dishes.Add(dish);
             }
             else
             {
