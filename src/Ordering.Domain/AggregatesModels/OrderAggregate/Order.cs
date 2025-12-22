@@ -28,7 +28,7 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
 
         public void AddDish(Dish dish)
         {
-            var dishInOrder = dishes.SingleOrDefault(d => d.ProductId == d.ProductId);
+            var dishInOrder = dishes.SingleOrDefault(d => d.ProductId == dish.ProductId);
 
             if (dishInOrder == null)
             {
@@ -44,7 +44,7 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
 
         public void DeleteDish(Dish dish)
         {
-            var dishInOrder = Dishes.SingleOrDefault(d => d.ProductId == d.ProductId);
+            var dishInOrder = Dishes.SingleOrDefault(d => d.ProductId == dish.ProductId);
 
             if (dishInOrder == null)
             {
@@ -57,7 +57,7 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
 
         public void UpdateDish(Dish dish)
         {
-            var dishInOrder = Dishes.SingleOrDefault(d => d.ProductId == d.ProductId);
+            var dishInOrder = Dishes.SingleOrDefault(d => d.ProductId == dish.ProductId);
 
             if (dish == null)
             {
