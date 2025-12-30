@@ -1,8 +1,9 @@
 ﻿using Ordering.Domain.Common;
+using Ordering.Domain.Events;
 
 namespace Ordering.Domain.AggregatesModels.OrderAggregate
 {
-    public class Order : BaseEntity
+    public class Order : BaseEntity, IAggregateRoot
     {
         public Guid UserId { get; set; }
 
@@ -15,6 +16,8 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
         private readonly IList<Dish> dishes = new List<Dish>();
 
         public IReadOnlyCollection<Dish> Dishes => dishes.AsReadOnly();
+
+        public int Version { get; private set; } = 0;
 
         public void CalculateTotalAmount()
         {
