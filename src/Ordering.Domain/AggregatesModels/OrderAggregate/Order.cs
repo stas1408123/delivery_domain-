@@ -80,5 +80,32 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
             this.Status = status;
         }
 
+
+        public void Apply(IEvent @event)
+        {
+            switch (@event)
+            {
+                case OrderCreatedEvent e:
+                    Apply(e);
+                    break;
+                case OrderStatusUpdatedEvent e:
+                    Apply(e);
+                    break;
+            }
+        }
+
+        private void Apply(OrderCreatedEvent e)
+        {
+            this.Id = e.OrderId;
+            this.UserId = e.UserId;
+            this.Status = OrderStatus.New;
+            Version += 1;
+        }
+        private void Apply(OrderStatusUpdatedEvent e)
+        {
+            this.Status = e.Status;
+            Version += 1;
+        }
+
     }
 }
