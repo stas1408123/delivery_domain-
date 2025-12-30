@@ -7,6 +7,7 @@ namespace Ordering.Application.Orders.Commands.CreateOrder
         public Guid Id { get; set; }
         public IEnumerable<OrderItemDTO> OrderItems { get; init; }
         public decimal Total { get; init; }
+        public OrderStatus Status { get; set; }
 
         public static OrderDraftDTO FromOrder(Order order)
         {
@@ -22,6 +23,7 @@ namespace Ordering.Application.Orders.Commands.CreateOrder
                 }),
                 Id = order.Id,
                 Total = order.TotalAmount,
+                Status = order.Status,
             };
         }
     }

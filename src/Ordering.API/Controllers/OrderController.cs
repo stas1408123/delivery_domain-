@@ -20,9 +20,9 @@ namespace Ordering.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<OrderDraftDTO>> GetOrders()
+        public async Task<IEnumerable<OrderDraftDTO>> GetOrders(Guid Id)
         {
-            var command = new GetOrdersQuery();
+            var command = new GetOrdersQuery(Id);
 
             _logger.LogInformation(
                 "Sending command: {CommandName} - {IdProperty}: {CommandId} ({@Command})",
@@ -36,7 +36,7 @@ namespace Ordering.API.Controllers
 
 
 
-        [HttpPost(Name = "AddOrder")]
+        [HttpPost]
         public async Task<OrderDraftDTO> CreateOrderDraftAsync(CreateOrderCommand command)
         {
             _logger.LogInformation(
