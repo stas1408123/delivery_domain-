@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Ordering.Application.Common.Interfaces;
 using Ordering.Domain.AggregatesModels.OrderAggregate;
+using Ordering.Infrastructure.Entities;
 
 namespace Ordering.Infrastructure
 {
@@ -10,6 +11,8 @@ namespace Ordering.Infrastructure
         {
             Database.EnsureCreated();
         }
+
+        public DbSet<StoredEvent> Events { get; set; }
 
         public DbSet<Order> Orders { get; set; }
 
