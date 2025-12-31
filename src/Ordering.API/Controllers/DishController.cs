@@ -24,8 +24,8 @@ namespace Ordering.API.Controllers
             _logger.LogInformation(
                 "Sending command: {CommandName} - {IdProperty}: {CommandId} ({@Command})",
                 "Add Dish",
-                nameof(command.BuyerId),
-                command.BuyerId,
+                nameof(command.OrderId),
+                command.OrderId,
                 command);
 
             return await _mediator.Send(command);
@@ -43,9 +43,9 @@ namespace Ordering.API.Controllers
         }
 
         [HttpDelete]
-        public async Task Delete([FromQuery] Guid Id, CancellationToken cancellationToken)
+        public async Task Delete([FromQuery] Guid OrderId, [FromQuery] Guid ProductId, CancellationToken cancellationToken)
         {
-            var command = new DeleteDishCommand(Id);
+            var command = new DeleteDishCommand(OrderId, ProductId);
 
             _logger.LogInformation(
                 "Sending command: {CommandName}: ({@Command})",

@@ -19,7 +19,7 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
 
         public int Version { get; private set; } = 0;
 
-        public void CalculateTotalAmount()
+        private void CalculateTotalAmount()
         {
             if (dishes.Count == 0)
             {
@@ -29,57 +29,49 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
             this.TotalAmount = dishes.Sum(x => x.SubTotal);
         }
 
-        public void AddDish(Dish dish)
+        private void DishAddedToOrder(DishAddedToOrderEvent e)
         {
-            var dishInOrder = dishes.SingleOrDefault(d => d.ProductId == dish.ProductId);
+            var dishInOrder = dishes.FirstOrDefault(d => d.ProductId == e.ProductId);
 
             if (dishInOrder == null)
             {
-                dishes.Add(dish);
+                dishes.Add(new Dish(e.ProductId, e.Amount, e.Cost));
             }
             else
             {
-                dishInOrder.Amount += dish.Amount;
+                dishInOrder.Amount += e.Amount;
             }
 
             CalculateTotalAmount();
         }
-
-        public void DeleteDish(Dish dish)
+        private void DishDeletedFromOrder(DishDeletedFromOrderEvent e)
         {
-            var dishInOrder = Dishes.SingleOrDefault(d => d.ProductId == dish.ProductId);
+            var dishInOrder = Dishes.FirstOrDefault(d => d.ProductId == e.ProductId);
 
             if (dishInOrder == null)
             {
                 return;
             }
 
-            dishes.Remove(dish);
+            dishes.Remove(dishInOrder);
             CalculateTotalAmount();
         }
 
-        public void UpdateDish(Dish dish)
+        private void DishUpdatedInOrder(DishUpdatedInOrderEvent e)
         {
-            var dishInOrder = Dishes.SingleOrDefault(d => d.ProductId == dish.ProductId);
+            var dishInOrder = Dishes.FirstOrDefault(d => d.ProductId == e.ProductId);
 
-            if (dish == null)
+            if (dishInOrder == null)
             {
-                dishes.Add(dish);
+                return;
             }
             else
             {
-                dishInOrder.Amount = dish.Amount;
-                dishInOrder.Cost = dish.Cost;
+                dishInOrder.Amount = e.Amount;
+                dishInOrder.Cost = e.Cost;
             }
             CalculateTotalAmount();
         }
-
-        // ToDo Some business logic for status change 
-        public void UpdateStatus(OrderStatus status)
-        {
-            this.Status = status;
-        }
-
 
         public void Apply(IEvent @event)
         {
@@ -89,6 +81,15 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
                     Apply(e);
                     break;
                 case OrderStatusUpdatedEvent e:
+                    Apply(e);
+                    break;
+                case DishAddedToOrderEvent e:
+                    Apply(e);
+                    break;
+                case DishDeletedFromOrderEvent e:
+                    Apply(e);
+                    break;
+                case DishUpdatedInOrderEvent e:
                     Apply(e);
                     break;
             }
@@ -101,11 +102,29 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
             this.Status = OrderStatus.New;
             Version += 1;
         }
+
         private void Apply(OrderStatusUpdatedEvent e)
         {
             this.Status = e.Status;
             Version += 1;
         }
 
+        private void Apply(DishAddedToOrderEvent e)
+        {
+            DishAddedToOrder(e);
+            Version += 1;
+        }
+
+        private void Apply(DishDeletedFromOrderEvent e)
+        {
+            DishDeletedFromOrder(e);
+            Version += 1;
+        }
+
+        private void Apply(DishUpdatedInOrderEvent e)
+        {
+            DishUpdatedInOrder(e);
+            Version += 1;
+        }
     }
 }

@@ -3,31 +3,34 @@ using Microsoft.EntityFrameworkCore;
 using Ordering.Application.Common.Interfaces;
 using Ordering.Application.Orders.Commands.CreateOrder;
 using Ordering.Domain.AggregatesModels.OrderAggregate;
+using Ordering.Domain.Common;
+using Ordering.Domain.Events;
 
 namespace Ordering.Application.Dishes.Commands
 {
-    public class AddDishCommandHandler : IRequestHandler<AddDishCommand, OrderDraftDTO>
+    public class AddDishCommandHandler(IEventStore eventStore) : IRequestHandler<AddDishCommand, OrderDraftDTO>
     {
-        private readonly IApplicationDbContext _context;
-
-        public AddDishCommandHandler(IApplicationDbContext context)
-        {
-            _context = context;
-        }
-
         public async Task<OrderDraftDTO> Handle(AddDishCommand command, CancellationToken cancellationToken)
         {
-            var order = await _context.Orders
-                .Include(x => x.Dishes)
-                .FirstOrDefaultAsync(o => o.UserId == command.BuyerId, cancellationToken);
+            var events = (await eventStore.Fetch(command.OrderId)).OrderBy(e => e.AggregateVersion);
 
-            var dish = new Dish(command.Item.ProductId, command.Item.Amount, command.Item.Cost);
+            var currentLatestVersion = events.Max(x => x.AggregateVersion);
 
-            order.AddDish(dish);
+            var order = new Order();
 
-            _context.Orders.Update(order);
+            events.ToList().ForEach(e => order.Apply(e));
 
-            await _context.SaveChangesAsync(cancellationToken);
+            var dishAddedToOrderEvent = new DishAddedToOrderEvent(
+                command.OrderId, 
+                command.Item.ProductId, 
+                command.Item.Cost, 
+                command.Item.Amount,
+                command.OrderId, 
+                currentLatestVersion);
+
+            order.Apply(dishAddedToOrderEvent);
+
+            await eventStore.Append(order.Id, [dishAddedToOrderEvent], dishAddedToOrderEvent.AggregateVersion);
 
             return OrderDraftDTO.FromOrder(order);
         }

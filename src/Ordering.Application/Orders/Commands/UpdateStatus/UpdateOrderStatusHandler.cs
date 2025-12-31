@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Ordering.Application.Orders.Commands.CreateOrder;
+using Ordering.Domain.AggregatesModels.OrderAggregate;
 using Ordering.Domain.Common;
 using Ordering.Domain.Events;
 
@@ -20,7 +21,7 @@ namespace Ordering.Application.Orders.Commands.UpdateStatus
 
             var currentLatestVersion = events.Max(x => x.AggregateVersion);
 
-            var order = new Domain.AggregatesModels.OrderAggregate.Order();
+            var order = new Order();
 
             events.ToList().ForEach(e => order.Apply(e));
 

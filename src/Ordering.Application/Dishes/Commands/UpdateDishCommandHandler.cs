@@ -1,31 +1,34 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Ordering.Application.Common.Interfaces;
 using Ordering.Application.Orders.Commands.CreateOrder;
 using Ordering.Domain.AggregatesModels.OrderAggregate;
+using Ordering.Domain.Common;
+using Ordering.Domain.Events;
 
 namespace Ordering.Application.Dishes.Commands
 {
-    public class UpdateDishCommandHandler : IRequestHandler<UpdateDishCommand, OrderDraftDTO>
+    public class UpdateDishCommandHandler(IEventStore eventStore) : IRequestHandler<UpdateDishCommand, OrderDraftDTO>
     {
-        private readonly IApplicationDbContext _context;
-
-        public UpdateDishCommandHandler(IApplicationDbContext context)
-        {
-            _context = context;
-        }
-
         public async Task<OrderDraftDTO> Handle(UpdateDishCommand command, CancellationToken cancellationToken)
         {
-            var order = await _context.Orders
-                .Include(x => x.Dishes)
-                .FirstOrDefaultAsync(o => o.Id == command.OrderId, cancellationToken);
+            var events = (await eventStore.Fetch(command.OrderId)).OrderBy(e => e.AggregateVersion);
 
-            var dish = new Dish(command.item.ProductId, command.item.Amount, command.item.Cost);
+            var currentLatestVersion = events.Max(x => x.AggregateVersion);
 
-            order.UpdateDish(dish);
+            var order = new Order();
 
-            await _context.SaveChangesAsync(cancellationToken);
+            events.ToList().ForEach(e => order.Apply(e));
+
+            var dishUpdatedInOrderEvent = new DishUpdatedInOrderEvent(
+                command.OrderId,
+                command.Item.ProductId,
+                command.Item.Cost,
+                command.Item.Amount,
+                command.OrderId,
+                currentLatestVersion);
+
+            order.Apply(dishUpdatedInOrderEvent);
+
+            await eventStore.Append(order.Id, [dishUpdatedInOrderEvent], dishUpdatedInOrderEvent.AggregateVersion);
 
             return OrderDraftDTO.FromOrder(order);
         }
