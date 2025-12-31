@@ -75,24 +75,7 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
 
         public void Apply(IEvent @event)
         {
-            switch (@event)
-            {
-                case OrderCreatedEvent e:
-                    Apply(e);
-                    break;
-                case OrderStatusUpdatedEvent e:
-                    Apply(e);
-                    break;
-                case DishAddedToOrderEvent e:
-                    Apply(e);
-                    break;
-                case DishDeletedFromOrderEvent e:
-                    Apply(e);
-                    break;
-                case DishUpdatedInOrderEvent e:
-                    Apply(e);
-                    break;
-            }
+            ((dynamic)this).Apply((dynamic)@event);
         }
 
         private void Apply(OrderCreatedEvent e)
