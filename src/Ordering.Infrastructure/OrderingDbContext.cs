@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Ordering.Application.Common.Interfaces;
-using Ordering.Domain.AggregatesModels.OrderAggregate;
 using Ordering.Infrastructure.Entities;
 
 namespace Ordering.Infrastructure
@@ -13,9 +12,5 @@ namespace Ordering.Infrastructure
         }
 
         public DbSet<StoredEvent> Events { get; set; }
-
-        public DbSet<Order> Orders { get; set; }
-
-        public DbSet<Dish> Dishes { get; set; }
     }
 }

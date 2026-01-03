@@ -3,8 +3,10 @@ using Ordering.Domain.Events;
 
 namespace Ordering.Domain.AggregatesModels.OrderAggregate
 {
-    public class Order : BaseEntity, IAggregateRoot
+    public class Order : IAggregateRoot
     {
+        // Should use aggID instead, pick up until migration complited 
+        public Guid Id { get; set; }
         public Guid UserId { get; set; }
 
         public decimal TotalAmount { get; private set; }
@@ -24,6 +26,7 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
             if (dishes.Count == 0)
             {
                 this.TotalAmount = 0;
+                return;
             }
 
             this.TotalAmount = dishes.Sum(x => x.SubTotal);
@@ -35,7 +38,7 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
 
             if (dishInOrder == null)
             {
-                dishes.Add(new Dish(e.ProductId, e.Amount, e.Cost));
+                dishes.Add(new Dish(e.ProductId, e.OrderId, e.Amount, e.Cost));
             }
             else
             {
