@@ -3,10 +3,8 @@ using Ordering.Domain.Events;
 
 namespace Ordering.Domain.AggregatesModels.OrderAggregate
 {
-    public class Order : IAggregateRoot
+    public class Order : BaseEventSourcedAggregate, IAggregateRoot
     {
-        // Should use aggID instead, pick up until migration complited 
-        public Guid Id { get; set; }
         public Guid UserId { get; set; }
 
         public decimal TotalAmount { get; private set; }
@@ -18,8 +16,6 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
         private readonly IList<Dish> dishes = new List<Dish>();
 
         public IReadOnlyCollection<Dish> Dishes => dishes.AsReadOnly();
-
-        public int Version { get; private set; } = 0;
 
         private void CalculateTotalAmount()
         {
@@ -76,7 +72,7 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
             CalculateTotalAmount();
         }
 
-        public void Apply(IEvent @event)
+        public override void Apply(IEvent @event)
         {
             ((dynamic)this).Apply((dynamic)@event);
         }
@@ -86,31 +82,26 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
             this.Id = e.OrderId;
             this.UserId = e.UserId;
             this.Status = OrderStatus.New;
-            Version += 1;
         }
 
         private void Apply(OrderStatusUpdatedEvent e)
         {
             this.Status = e.Status;
-            Version += 1;
         }
 
         private void Apply(DishAddedToOrderEvent e)
         {
             DishAddedToOrder(e);
-            Version += 1;
         }
 
         private void Apply(DishDeletedFromOrderEvent e)
         {
             DishDeletedFromOrder(e);
-            Version += 1;
         }
 
         private void Apply(DishUpdatedInOrderEvent e)
         {
             DishUpdatedInOrder(e);
-            Version += 1;
         }
     }
 }

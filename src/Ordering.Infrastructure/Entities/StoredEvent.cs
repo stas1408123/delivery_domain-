@@ -8,7 +8,7 @@
         public int AggregateVersion { get; set; }
         public string EventType { get; set; }
         // JSONB ??? 
-        public string Data { get; set; } 
+        public string Data { get; set; }
         public DateTimeOffset Timestamp { get; set; }
     }
 }

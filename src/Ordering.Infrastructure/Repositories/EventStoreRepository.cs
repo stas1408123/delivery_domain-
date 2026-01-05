@@ -42,7 +42,7 @@ namespace Ordering.Infrastructure.Repositories
                     AggregateVersion = @event.AggregateVersion,
                     Data = _serializer.Serialize(@event),
                     Timestamp = @event.CreatedAt,
-                    EventType = @event.GetType().AssemblyQualifiedName 
+                    EventType = @event.GetType().AssemblyQualifiedName
                 });
             }
 

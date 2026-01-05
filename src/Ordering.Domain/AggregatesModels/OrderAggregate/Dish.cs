@@ -1,6 +1,4 @@
-﻿using Ordering.Domain.Common;
-
-namespace Ordering.Domain.AggregatesModels.OrderAggregate
+﻿namespace Ordering.Domain.AggregatesModels.OrderAggregate
 {
     public class Dish
     {
@@ -40,7 +38,7 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
             }
         }
 
-        public Dish(Guid productId,Guid orderId, int amount, decimal cost)
+        public Dish(Guid productId, Guid orderId, int amount, decimal cost)
         {
             ProductId = productId;
             OrderId = orderId;
