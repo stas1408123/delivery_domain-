@@ -1,35 +1,22 @@
 ﻿using MediatR;
 using Ordering.Application.Orders.Commands.CreateOrder;
+using Ordering.Application.Services;
 using Ordering.Domain.AggregatesModels.OrderAggregate;
-using Ordering.Domain.Common;
 using Ordering.Domain.Events;
 
 namespace Ordering.Application.Orders.Commands.UpdateStatus
 {
-    public class UpdateOrderStatusHandler : IRequestHandler<UpdateOrderStatusCommand, OrderDraftDTO>
+    public class UpdateOrderStatusHandler(IEventSourcedRepository<Order> _orderRepository) : IRequestHandler<UpdateOrderStatusCommand, OrderDraftDTO>
     {
-        private readonly IEventStore _eventStore;
-
-        public UpdateOrderStatusHandler(IEventStore eventStore)
-        {
-            _eventStore = eventStore;
-        }
-
         public async Task<OrderDraftDTO> Handle(UpdateOrderStatusCommand command, CancellationToken cancellationToken)
         {
-            var events = (await _eventStore.Fetch(command.OrderId)).OrderBy(e => e.AggregateVersion);
+            var order = await _orderRepository.GetByIdAsync(command.OrderId);
 
-            var currentLatestVersion = events.Max(x => x.AggregateVersion);
+            var orderStatusUpdatedEvent = new OrderStatusUpdatedEvent(command.OrderId, command.status, command.OrderId, order.Version, DateTime.Now);
 
-            var order = new Order();
+            order.AppendEvent(orderStatusUpdatedEvent);
 
-            events.ToList().ForEach(e => order.Apply(e));
-
-            var orderStatusUpdatedEvent = new OrderStatusUpdatedEvent(command.OrderId, command.status, command.OrderId, currentLatestVersion, DateTime.Now);
-
-            order.Apply(orderStatusUpdatedEvent);
-
-            await _eventStore.Append(order.Id, [orderStatusUpdatedEvent], orderStatusUpdatedEvent.AggregateVersion);
+            await _orderRepository.SaveAsync(order);
 
             return OrderDraftDTO.FromOrder(order);
         }

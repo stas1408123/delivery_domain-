@@ -1,22 +1,16 @@
 ﻿using MediatR;
 using Ordering.Application.Orders.Commands.CreateOrder;
+using Ordering.Application.Services;
 using Ordering.Domain.AggregatesModels.OrderAggregate;
-using Ordering.Domain.Common;
 using Ordering.Domain.Events;
 
 namespace Ordering.Application.Dishes.Commands
 {
-    public class UpdateDishCommandHandler(IEventStore eventStore) : IRequestHandler<UpdateDishCommand, OrderDraftDTO>
+    public class UpdateDishCommandHandler(IEventSourcedRepository<Order> _orderRepository) : IRequestHandler<UpdateDishCommand, OrderDraftDTO>
     {
         public async Task<OrderDraftDTO> Handle(UpdateDishCommand command, CancellationToken cancellationToken)
         {
-            var events = (await eventStore.Fetch(command.OrderId)).OrderBy(e => e.AggregateVersion);
-
-            var currentLatestVersion = events.Max(x => x.AggregateVersion);
-
-            var order = new Order();
-
-            events.ToList().ForEach(e => order.Apply(e));
+            var order = await _orderRepository.GetByIdAsync(command.OrderId);
 
             var dishUpdatedInOrderEvent = new DishUpdatedInOrderEvent(
                 command.OrderId,
@@ -24,11 +18,11 @@ namespace Ordering.Application.Dishes.Commands
                 command.Item.Cost,
                 command.Item.Amount,
                 command.OrderId,
-                currentLatestVersion);
+                order.Version);
 
-            order.Apply(dishUpdatedInOrderEvent);
+            order.AppendEvent(dishUpdatedInOrderEvent);
 
-            await eventStore.Append(order.Id, [dishUpdatedInOrderEvent], dishUpdatedInOrderEvent.AggregateVersion);
+            await _orderRepository.SaveAsync(order);
 
             return OrderDraftDTO.FromOrder(order);
         }

@@ -1,24 +1,25 @@
 ﻿using MediatR;
-using Ordering.Domain.Common;
+using Ordering.Application.Services;
+using Ordering.Domain.AggregatesModels.OrderAggregate;
 using Ordering.Domain.Events;
 
 namespace Ordering.Application.Dishes.Commands
 {
-    public class DeleteDishCommandHandler(IEventStore eventStore) : IRequestHandler<DeleteDishCommand>
+    public class DeleteDishCommandHandler(IEventSourcedRepository<Order> _orderRepository) : IRequestHandler<DeleteDishCommand>
     {
         public async Task Handle(DeleteDishCommand command, CancellationToken cancellationToken)
         {
-            var events = (await eventStore.Fetch(command.OrderId)).OrderBy(e => e.AggregateVersion);
+            var order = await _orderRepository.GetByIdAsync(command.OrderId);
 
-            var currentLatestVersion = events.Max(x => x.AggregateVersion);
-
-            var dishAddedToOrderEvent = new DishDeletedFromOrderEvent(
+            var dishDeletedFromOrderEvent = new DishDeletedFromOrderEvent(
                 command.OrderId,
                 command.ProductId,
                 command.OrderId,
-                currentLatestVersion);
+                order.Version);
 
-            await eventStore.Append(command.OrderId, [dishAddedToOrderEvent], dishAddedToOrderEvent.AggregateVersion);
+            order.AppendEvent(dishDeletedFromOrderEvent);
+            await _orderRepository.SaveAsync(order);
+
         }
     }
 }
