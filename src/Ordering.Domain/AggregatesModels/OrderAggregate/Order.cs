@@ -1,8 +1,9 @@
 ﻿using Ordering.Domain.Common;
+using Ordering.Domain.Events;
 
 namespace Ordering.Domain.AggregatesModels.OrderAggregate
 {
-    public class Order : BaseEntity
+    public class Order : BaseEventSourcedAggregate, IAggregateRoot
     {
         public Guid UserId { get; set; }
 
@@ -16,66 +17,91 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
 
         public IReadOnlyCollection<Dish> Dishes => dishes.AsReadOnly();
 
-        public void CalculateTotalAmount()
+        private void CalculateTotalAmount()
         {
             if (dishes.Count == 0)
             {
                 this.TotalAmount = 0;
+                return;
             }
 
             this.TotalAmount = dishes.Sum(x => x.SubTotal);
         }
 
-        public void AddDish(Dish dish)
+        private void DishAddedToOrder(DishAddedToOrderEvent e)
         {
-            var dishInOrder = dishes.SingleOrDefault(d => d.ProductId == d.ProductId);
+            var dishInOrder = dishes.FirstOrDefault(d => d.ProductId == e.ProductId);
 
             if (dishInOrder == null)
             {
-                dishes.Add(dish);
+                dishes.Add(new Dish(e.ProductId, e.OrderId, e.Amount, e.Cost));
             }
             else
             {
-                dishInOrder.Amount += dish.Amount;
+                dishInOrder.Amount += e.Amount;
             }
 
             CalculateTotalAmount();
         }
-
-        public void DeleteDish(Dish dish)
+        private void DishDeletedFromOrder(DishDeletedFromOrderEvent e)
         {
-            var dishInOrder = Dishes.SingleOrDefault(d => d.ProductId == d.ProductId);
+            var dishInOrder = Dishes.FirstOrDefault(d => d.ProductId == e.ProductId);
 
             if (dishInOrder == null)
             {
                 return;
             }
 
-            dishes.Remove(dish);
+            dishes.Remove(dishInOrder);
             CalculateTotalAmount();
         }
 
-        public void UpdateDish(Dish dish)
+        private void DishUpdatedInOrder(DishUpdatedInOrderEvent e)
         {
-            var dishInOrder = Dishes.SingleOrDefault(d => d.ProductId == d.ProductId);
+            var dishInOrder = Dishes.FirstOrDefault(d => d.ProductId == e.ProductId);
 
-            if (dish == null)
+            if (dishInOrder == null)
             {
-                dishes.Add(dish);
+                return;
             }
             else
             {
-                dishInOrder.Amount = dish.Amount;
-                dishInOrder.Cost = dish.Cost;
+                dishInOrder.Amount = e.Amount;
+                dishInOrder.Cost = e.Cost;
             }
             CalculateTotalAmount();
         }
 
-        // ToDo Some business logic for status change 
-        public void UpdateStatus(OrderStatus status)
+        public override void Apply(IEvent @event)
         {
-            this.Status = status;
+            ((dynamic)this).Apply((dynamic)@event);
         }
 
+        private void Apply(OrderCreatedEvent e)
+        {
+            this.Id = e.OrderId;
+            this.UserId = e.UserId;
+            this.Status = OrderStatus.New;
+        }
+
+        private void Apply(OrderStatusUpdatedEvent e)
+        {
+            this.Status = e.Status;
+        }
+
+        private void Apply(DishAddedToOrderEvent e)
+        {
+            DishAddedToOrder(e);
+        }
+
+        private void Apply(DishDeletedFromOrderEvent e)
+        {
+            DishDeletedFromOrder(e);
+        }
+
+        private void Apply(DishUpdatedInOrderEvent e)
+        {
+            DishUpdatedInOrder(e);
+        }
     }
 }

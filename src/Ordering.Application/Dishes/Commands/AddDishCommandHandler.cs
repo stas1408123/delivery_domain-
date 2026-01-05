@@ -1,33 +1,26 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Ordering.Application.Common.Interfaces;
 using Ordering.Application.Orders.Commands.CreateOrder;
+using Ordering.Application.Services;
 using Ordering.Domain.AggregatesModels.OrderAggregate;
+using Ordering.Domain.Events;
 
 namespace Ordering.Application.Dishes.Commands
 {
-    public class AddDishCommandHandler : IRequestHandler<AddDishCommand, OrderDraftDTO>
+    public class AddDishCommandHandler(IEventSourcedRepository<Order> _orderRepository) : IRequestHandler<AddDishCommand, OrderDraftDTO>
     {
-        private readonly IApplicationDbContext _context;
-
-        public AddDishCommandHandler(IApplicationDbContext context)
-        {
-            _context = context;
-        }
-
         public async Task<OrderDraftDTO> Handle(AddDishCommand command, CancellationToken cancellationToken)
         {
-            var order = await _context.Orders
-                .Include(x => x.Dishes)
-                .FirstOrDefaultAsync(o => o.UserId == command.BuyerId, cancellationToken);
+            var order = await _orderRepository.GetByIdAsync(command.OrderId);
 
-            var dish = new Dish(command.Item.ProductId, command.Item.Amount, command.Item.Cost);
+            order.AppendEvent(new DishAddedToOrderEvent(
+                command.OrderId,
+                command.Item.ProductId,
+                command.Item.Cost,
+                command.Item.Amount,
+                command.OrderId,
+                order.Version));
 
-            order.AddDish(dish);
-
-            _context.Orders.Update(order);
-
-            await _context.SaveChangesAsync(cancellationToken);
+            await _orderRepository.SaveAsync(order);
 
             return OrderDraftDTO.FromOrder(order);
         }

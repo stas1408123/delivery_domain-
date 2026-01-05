@@ -1,8 +1,6 @@
-﻿using Ordering.Domain.Common;
-
-namespace Ordering.Domain.AggregatesModels.OrderAggregate
+﻿namespace Ordering.Domain.AggregatesModels.OrderAggregate
 {
-    public class Dish : BaseEntity
+    public class Dish
     {
         private decimal subTotal;
         private int amount;
@@ -10,8 +8,6 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
 
         public Guid ProductId { get; set; }
         public Guid OrderId { get; set; }
-
-        public Order order { get; set; }
 
         public int Amount
         {
@@ -42,9 +38,10 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
             }
         }
 
-        public Dish(Guid productId, int amount, decimal cost)
+        public Dish(Guid productId, Guid orderId, int amount, decimal cost)
         {
             ProductId = productId;
+            OrderId = orderId;
             Amount = amount;
             Cost = cost;
             SubTotal = Amount * Cost;

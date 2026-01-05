@@ -1,25 +1,22 @@
 ﻿using MediatR;
-using Ordering.Application.Common.Interfaces;
 using Ordering.Application.Orders.Commands.CreateOrder;
+using Ordering.Application.Services;
+using Ordering.Domain.AggregatesModels.OrderAggregate;
+using Ordering.Domain.Events;
 
 namespace Ordering.Application.Orders.Commands.UpdateStatus
 {
-    public class UpdateOrderStatusHandler : IRequestHandler<UpdateOrderStatusCommand, OrderDraftDTO>
+    public class UpdateOrderStatusHandler(IEventSourcedRepository<Order> _orderRepository) : IRequestHandler<UpdateOrderStatusCommand, OrderDraftDTO>
     {
-        private readonly IApplicationDbContext _context;
-
-        public UpdateOrderStatusHandler(IApplicationDbContext context)
-        {
-            _context = context;
-        }
-
         public async Task<OrderDraftDTO> Handle(UpdateOrderStatusCommand command, CancellationToken cancellationToken)
         {
-            var order = _context.Orders.Single(x => x.Id == command.OrderId);
+            var order = await _orderRepository.GetByIdAsync(command.OrderId);
 
-            order.UpdateStatus(command.status);
+            var orderStatusUpdatedEvent = new OrderStatusUpdatedEvent(command.OrderId, command.status, command.OrderId, order.Version, DateTime.Now);
 
-            await _context.SaveChangesAsync(cancellationToken);
+            order.AppendEvent(orderStatusUpdatedEvent);
+
+            await _orderRepository.SaveAsync(order);
 
             return OrderDraftDTO.FromOrder(order);
         }

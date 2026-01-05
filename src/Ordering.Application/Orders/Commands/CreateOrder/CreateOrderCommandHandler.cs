@@ -1,38 +1,34 @@
 ﻿using MediatR;
-using Ordering.Application.Common.Interfaces;
+using Ordering.Application.Services;
 using Ordering.Domain.AggregatesModels.OrderAggregate;
+using Ordering.Domain.Events;
 
 namespace Ordering.Application.Orders.Commands.CreateOrder;
 
-
-
-public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, OrderDraftDTO>
+public class CreateOrderCommandHandler(IEventSourcedRepository<Order> _orderRepository) : IRequestHandler<CreateOrderCommand, OrderDraftDTO>
 {
-    private readonly IApplicationDbContext _context;
-
-    public CreateOrderCommandHandler(IApplicationDbContext context)
-    {
-        _context = context;
-    }
-
     public async Task<OrderDraftDTO> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
-        var entity = new Order();
+        var order = new Order();
+        var orderId = Guid.NewGuid();
 
-        entity.UserId = request.BuyerId;
-
-        entity.UpdateStatus(OrderStatus.New);
+        var orderCreatedEvent = new OrderCreatedEvent(orderId, request.BuyerId, DateTime.Now, orderId, 0);
+        order.AppendEvent(orderCreatedEvent);
 
         foreach (var item in request.Items)
         {
-            entity.AddDish(new Dish(item.ProductId, item.Amount, item.Cost));
+            order.AppendEvent(new DishAddedToOrderEvent(
+                orderId,
+                item.ProductId,
+                item.Cost,
+                item.Amount,
+                orderId,
+                order.Version));
         }
 
-        _context.Orders.Add(entity);
+        await _orderRepository.SaveAsync(order);
 
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return OrderDraftDTO.FromOrder(entity);
+        return OrderDraftDTO.FromOrder(order);
     }
 }
 

@@ -1,31 +1,25 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Ordering.Application.Common.Interfaces;
+using Ordering.Application.Services;
+using Ordering.Domain.AggregatesModels.OrderAggregate;
+using Ordering.Domain.Events;
 
 namespace Ordering.Application.Dishes.Commands
 {
-    public class DeleteDishCommandHandler : IRequestHandler<DeleteDishCommand>
+    public class DeleteDishCommandHandler(IEventSourcedRepository<Order> _orderRepository) : IRequestHandler<DeleteDishCommand>
     {
-        private readonly IApplicationDbContext _context;
-
-        public DeleteDishCommandHandler(IApplicationDbContext context)
-        {
-            _context = context;
-        }
-
         public async Task Handle(DeleteDishCommand command, CancellationToken cancellationToken)
         {
-            var dish = await _context.Dishes.SingleAsync(x => x.Id == command.Id);
+            var order = await _orderRepository.GetByIdAsync(command.OrderId);
 
-            var order = await _context.Orders
-                .Include(x => x.Dishes)
-                .FirstOrDefaultAsync(o => o.Id == dish.OrderId, cancellationToken);
+            var dishDeletedFromOrderEvent = new DishDeletedFromOrderEvent(
+                command.OrderId,
+                command.ProductId,
+                command.OrderId,
+                order.Version);
 
-            order.DeleteDish(dish);
+            order.AppendEvent(dishDeletedFromOrderEvent);
+            await _orderRepository.SaveAsync(order);
 
-            _context.Orders.Update(order);
-
-            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }
