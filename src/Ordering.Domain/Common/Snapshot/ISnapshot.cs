@@ -1,4 +1,4 @@
-﻿namespace Ordering.Domain.Common
+﻿namespace Ordering.Domain.Common.Snapshot
 {
     public interface ISnapshot
     {

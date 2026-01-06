@@ -1,4 +1,4 @@
-﻿using Ordering.Domain.Common;
+﻿using Ordering.Domain.Common.Snapshot;
 
 namespace Ordering.Infrastructure.Cache
 {
