@@ -1,17 +1,18 @@
-﻿using Ordering.Domain.Common;
+﻿using Ordering.Application.Common.Interfaces;
+using Ordering.Domain.Common;
 using Ordering.Domain.Events;
 
 namespace Ordering.Domain.AggregatesModels.OrderAggregate
 {
-    public class Order : BaseEventSourcedAggregate, IAggregateRoot
+    public class Order : BaseEventSourcedAggregate, IAggregateRoot, ISnapshotable<OrderSnapshot>
     {
-        public Guid UserId { get; set; }
+        public Guid UserId { get; private set; }
 
         public decimal TotalAmount { get; private set; }
 
         public OrderStatus Status { get; private set; }
 
-        public int ItemCount { get; private set; }
+        public int ItemCount { get; private set; } = 0;
 
         private readonly IList<Dish> dishes = new List<Dish>();
 
@@ -41,7 +42,7 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
                 dishInOrder.Amount += e.Amount;
             }
 
-            CalculateTotalAmount();
+            RecalculateDerivedState();
         }
         private void DishDeletedFromOrder(DishDeletedFromOrderEvent e)
         {
@@ -53,7 +54,7 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
             }
 
             dishes.Remove(dishInOrder);
-            CalculateTotalAmount();
+            RecalculateDerivedState();
         }
 
         private void DishUpdatedInOrder(DishUpdatedInOrderEvent e)
@@ -69,7 +70,7 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
                 dishInOrder.Amount = e.Amount;
                 dishInOrder.Cost = e.Cost;
             }
-            CalculateTotalAmount();
+            RecalculateDerivedState();
         }
 
         public override void Apply(IEvent @event)
@@ -103,5 +104,52 @@ namespace Ordering.Domain.AggregatesModels.OrderAggregate
         {
             DishUpdatedInOrder(e);
         }
+
+        private void RecalculateDerivedState()
+        {
+            ItemCount = dishes.Count;
+            TotalAmount = dishes.Sum(d => d.SubTotal);
+        }
+
+        public OrderSnapshot CreateSnapshot()
+        {
+            var dishSnapshots = this.dishes
+                .Select(d => new DishSnapshot(
+                    d.ProductId,
+                    d.Amount,
+                    d.Cost))
+                .ToList();
+
+            return new OrderSnapshot(
+                id: this.Id,
+                version: this.Version,
+                userId: this.UserId,
+                totalAmount: this.TotalAmount,
+                status: this.Status,
+                dishes: dishSnapshots
+            );
+        }
+
+        public void RestoreFromSnapshot(OrderSnapshot snapshot)
+        {
+            Id = snapshot.AggregateId;
+            Version = snapshot.Version;
+            UserId = snapshot.UserId;
+            Status = snapshot.Status;
+
+            dishes.Clear();
+            foreach (var dish in snapshot.Dishes)
+            {
+                dishes.Add(new Dish(
+                    productId: dish.ProductId,
+                    orderId: Id,
+                    amount: dish.Amount,
+                    cost: dish.Cost
+                ));
+            }
+
+            RecalculateDerivedState();
+        }
+
     }
 }

@@ -15,13 +15,15 @@
         {
             foreach (var @event in history.OrderBy(e => e.AggregateVersion))
             {
+                Version = @event.AggregateVersion;
                 Apply(@event);
             }
         }
 
         public void AppendEvent(IEvent @event)
         {
-            Version = @event.AggregateVersion++;
+            Version++;                         
+            @event.AggregateVersion = Version;
             Apply(@event);
             _uncommittedEvents.Add(@event);
         }
