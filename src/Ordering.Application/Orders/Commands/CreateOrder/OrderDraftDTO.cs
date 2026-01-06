@@ -1,4 +1,5 @@
-﻿using Ordering.Domain.AggregatesModels.OrderAggregate;
+﻿using Ordering.Application.ReadModels.Orders.Models;
+using Ordering.Domain.AggregatesModels.OrderAggregate;
 
 namespace Ordering.Application.Orders.Commands.CreateOrder
 {
@@ -26,6 +27,25 @@ namespace Ordering.Application.Orders.Commands.CreateOrder
                 Status = order.Status,
             };
         }
+
+        public static OrderDraftDTO FromReadModel(OrderReadModel readModel)
+        {
+            return new OrderDraftDTO
+            {
+                Id = readModel.Id,
+                Total = readModel.TotalAmount,
+                Status = readModel.Status,
+                OrderItems = readModel.Dishes.Select(oi => new OrderItemDTO
+                {
+                    ProductId = oi.ProductId,
+                    OrderId = readModel.Id,
+                    Amount = oi.Amount,
+                    Cost = oi.Cost,
+                    SubTotal = oi.Amount * oi.Cost
+                })
+            };
+        }
+
     }
 
     public record OrderItemDTO

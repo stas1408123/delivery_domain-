@@ -22,7 +22,7 @@
 
         public void AppendEvent(IEvent @event)
         {
-            Version++;                         
+            Version++;
             @event.AggregateVersion = Version;
             Apply(@event);
             _uncommittedEvents.Add(@event);

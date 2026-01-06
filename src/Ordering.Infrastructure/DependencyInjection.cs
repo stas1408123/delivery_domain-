@@ -24,7 +24,7 @@ namespace Ordering.Infrastructure
             builder.Services.AddSingleton<ICacheRepository, MemoryCacheRepository>();
             builder.Services.AddSingleton<ISnapshotCache<OrderSnapshot>, SnapshotCache<OrderSnapshot>>();
             builder.Services.AddScoped(typeof(IEventSourcedRepository<Order>), typeof(OrderRepository));
-
+            builder.Services.AddScoped<IOrderReadModelRepository, OrderReadModelRepository>();
 
             builder.Services.AddScoped(typeof(IEventSourcedRepository<>), typeof(EventSourcedRepository<>));
             builder.Services.AddDbContext<OrderingDbContext>((options) =>

@@ -1,9 +1,10 @@
-﻿using Ordering.Domain.AggregatesModels.OrderAggregate;
+﻿using MediatR;
+using Ordering.Domain.AggregatesModels.OrderAggregate;
 using Ordering.Domain.Common;
 
 namespace Ordering.Domain.Events
 {
-    public record OrderStatusUpdatedEvent : IEvent
+    public record OrderStatusUpdatedEvent : IEvent, INotification
     {
         public OrderStatusUpdatedEvent
             (Guid orderId,

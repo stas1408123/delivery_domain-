@@ -1,8 +1,9 @@
-﻿using Ordering.Domain.Common;
+﻿using MediatR;
+using Ordering.Domain.Common;
 
 namespace Ordering.Domain.Events
 {
-    public record OrderCreatedEvent : IEvent
+    public record OrderCreatedEvent : IEvent, INotification
     {
         public OrderCreatedEvent(Guid OrderId, Guid UserId, DateTime CreatedAt, Guid AggregateId, int AggregateVersion)
         {

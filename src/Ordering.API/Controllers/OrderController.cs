@@ -20,7 +20,7 @@ namespace Ordering.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<OrderDraftDTO>> GetOrders(Guid Id)
+        public async Task<IEnumerable<OrderDraftDTO>> GetOrders(Guid? Id)
         {
             var command = new GetOrdersQuery(Id);
 

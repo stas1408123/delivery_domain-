@@ -47,7 +47,7 @@ namespace Ordering.Infrastructure.Repositories
             }
 
             var events = await eventStore.Fetch(id, fromVersion);
-            
+
             if (!events.Any() && snapshot == null)
             {
                 return null;
