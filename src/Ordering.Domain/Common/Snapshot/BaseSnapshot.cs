@@ -1,4 +1,6 @@
-﻿namespace Ordering.Domain.Common
+﻿using Ordering.Domain.Common.Snapshot;
+
+namespace Ordering.Domain.Common
 {
     public abstract class BaseSnapshot : ISnapshot
     {

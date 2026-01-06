@@ -1,4 +1,5 @@
-﻿using Ordering.Domain.Common.Snapshot;
+﻿using Ordering.Domain.Common;
+using Ordering.Domain.Common.Snapshot;
 
 namespace Ordering.Domain.AggregatesModels.OrderAggregate
 {
