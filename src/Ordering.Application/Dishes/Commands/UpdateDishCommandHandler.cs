@@ -6,7 +6,7 @@ using Ordering.Domain.Events;
 
 namespace Ordering.Application.Dishes.Commands
 {
-    public class UpdateDishCommandHandler(IEventSourcedRepository<Order> _orderRepository) : IRequestHandler<UpdateDishCommand, OrderDraftDTO>
+    public class UpdateDishCommandHandler(IEventSourcedRepository<Order> _orderRepository, IMediator _mediator) : IRequestHandler<UpdateDishCommand, OrderDraftDTO>
     {
         public async Task<OrderDraftDTO> Handle(UpdateDishCommand command, CancellationToken cancellationToken)
         {
@@ -23,6 +23,7 @@ namespace Ordering.Application.Dishes.Commands
             order.AppendEvent(dishUpdatedInOrderEvent);
 
             await _orderRepository.SaveAsync(order);
+            await _mediator.Publish(dishUpdatedInOrderEvent);
 
             return OrderDraftDTO.FromOrder(order);
         }

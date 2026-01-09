@@ -5,7 +5,7 @@ using Ordering.Domain.Events;
 
 namespace Ordering.Application.Dishes.Commands
 {
-    public class DeleteDishCommandHandler(IEventSourcedRepository<Order> _orderRepository) : IRequestHandler<DeleteDishCommand>
+    public class DeleteDishCommandHandler(IEventSourcedRepository<Order> _orderRepository, IMediator _mediator) : IRequestHandler<DeleteDishCommand>
     {
         public async Task Handle(DeleteDishCommand command, CancellationToken cancellationToken)
         {
@@ -19,6 +19,7 @@ namespace Ordering.Application.Dishes.Commands
 
             order.AppendEvent(dishDeletedFromOrderEvent);
             await _orderRepository.SaveAsync(order);
+            await _mediator.Publish(dishDeletedFromOrderEvent);
 
         }
     }

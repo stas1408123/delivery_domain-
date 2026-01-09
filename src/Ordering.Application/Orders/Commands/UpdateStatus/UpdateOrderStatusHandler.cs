@@ -6,7 +6,7 @@ using Ordering.Domain.Events;
 
 namespace Ordering.Application.Orders.Commands.UpdateStatus
 {
-    public class UpdateOrderStatusHandler(IEventSourcedRepository<Order> _orderRepository) : IRequestHandler<UpdateOrderStatusCommand, OrderDraftDTO>
+    public class UpdateOrderStatusHandler(IEventSourcedRepository<Order> _orderRepository, IMediator _mediator) : IRequestHandler<UpdateOrderStatusCommand, OrderDraftDTO>
     {
         public async Task<OrderDraftDTO> Handle(UpdateOrderStatusCommand command, CancellationToken cancellationToken)
         {
@@ -18,6 +18,7 @@ namespace Ordering.Application.Orders.Commands.UpdateStatus
 
             await _orderRepository.SaveAsync(order);
 
+            await _mediator.Publish(orderStatusUpdatedEvent);
             return OrderDraftDTO.FromOrder(order);
         }
     }
