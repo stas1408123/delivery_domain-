@@ -1,8 +1,9 @@
-﻿using Ordering.Domain.Common;
+﻿using MediatR;
+using Ordering.Domain.Common;
 
 namespace Ordering.Domain.Events
 {
-    public record DishUpdatedInOrderEvent : IEvent
+    public record DishUpdatedInOrderEvent : IEvent, INotification
     {
         public DishUpdatedInOrderEvent(
             Guid orderId,
