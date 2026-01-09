@@ -1,18 +1,27 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Ordering.Application.Common.Interfaces;
 using Ordering.Application.Orders.Commands.CreateOrder;
-using Ordering.Application.Services;
-using Ordering.Domain.AggregatesModels.OrderAggregate;
+using Ordering.Application.ReadModels.Orders.Models;
 
 namespace Ordering.Application.Orders.Queries.GetOrder
 {
-    public class GetOrdersQueryHandler(IEventSourcedRepository<Order> _orderRepository) : IRequestHandler<GetOrdersQuery, IEnumerable<OrderDraftDTO>>
+    public class GetOrdersQueryHandler(IOrderReadModelRepository repository) : IRequestHandler<GetOrdersQuery, IEnumerable<OrderDraftDTO>>
     {
-        // ToDo add common select order with optional id 
         public async Task<IEnumerable<OrderDraftDTO>> Handle(GetOrdersQuery request, CancellationToken cancellationToken)
         {
-            var order = await _orderRepository.GetByIdAsync(request.Id);
+            IQueryable<OrderReadModel> query = repository.Get(o => true)
+                                                   .Include(o => o.Dishes);
 
-            return (new List<Order>([order])).Select(OrderDraftDTO.FromOrder);
+            if (request.Id.HasValue)
+            {
+                query = query.Where(o => o.Id == request.Id.Value);
+            }
+
+            var orders = await query.AsNoTracking().ToListAsync(cancellationToken);
+
+            return orders.Select(OrderDraftDTO.FromReadModel);
         }
     }
 }
+

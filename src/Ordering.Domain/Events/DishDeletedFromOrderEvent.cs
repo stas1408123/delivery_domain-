@@ -1,8 +1,9 @@
-﻿using Ordering.Domain.Common;
+﻿using MediatR;
+using Ordering.Domain.Common;
 
 namespace Ordering.Domain.Events
 {
-    public record DishDeletedFromOrderEvent : IEvent
+    public record DishDeletedFromOrderEvent : IEvent, INotification
     {
         public DishDeletedFromOrderEvent(Guid orderId, Guid productId, Guid aggregateId, int aggregateVersion)
         {

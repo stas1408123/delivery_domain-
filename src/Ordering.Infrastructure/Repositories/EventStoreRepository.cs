@@ -57,6 +57,11 @@ namespace Ordering.Infrastructure.Repositories
                 .OrderBy(e => e.AggregateVersion)
                 .ToListAsync();
 
+            return MapToDomainEvents(storedEvents);
+        }
+
+        private IEnumerable<IEvent> MapToDomainEvents(List<StoredEvent> storedEvents)
+        {
             if (!storedEvents.Any())
             {
                 return new List<IEvent>();
@@ -73,6 +78,16 @@ namespace Ordering.Infrastructure.Repositories
                 }
             }
             return domainEvents;
+        }
+
+        public async Task<IEnumerable<IEvent>> Fetch(Guid aggregateId, int fromVersion)
+        {
+            var storedEvents = await _context.Events
+                .Where(e => e.AggregateId == aggregateId && e.AggregateVersion >= fromVersion)
+                .OrderBy(e => e.AggregateVersion)
+                .ToListAsync();
+
+            return MapToDomainEvents(storedEvents);
         }
     }
 
