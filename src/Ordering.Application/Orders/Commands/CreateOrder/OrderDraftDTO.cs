@@ -38,7 +38,7 @@ namespace Ordering.Application.Orders.Commands.CreateOrder
                 OrderItems = readModel.Dishes.Select(oi => new OrderItemDTO
                 {
                     ProductId = oi.ProductId,
-                    OrderId = readModel.Id, 
+                    OrderId = readModel.Id,
                     Amount = oi.Amount,
                     Cost = oi.Cost,
                     SubTotal = oi.Amount * oi.Cost

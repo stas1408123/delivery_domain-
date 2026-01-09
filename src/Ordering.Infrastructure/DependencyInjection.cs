@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Ordering.Application.Common.Interfaces;
-using Ordering.Application.ReadModels.Orders.Models;
 using Ordering.Application.Services;
 using Ordering.Domain.AggregatesModels.OrderAggregate;
 using Ordering.Domain.Common;

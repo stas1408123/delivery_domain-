@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Ordering.Application.Common.Interfaces;
 using Ordering.Application.ReadModels.Orders.Models;
 using Ordering.Domain.AggregatesModels.OrderAggregate;

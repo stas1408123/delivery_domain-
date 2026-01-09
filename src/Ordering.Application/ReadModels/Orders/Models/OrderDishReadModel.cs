@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Ordering.Application.ReadModels.Orders.Models
+﻿namespace Ordering.Application.ReadModels.Orders.Models
 {
     public class OrderDishReadModel
     {
